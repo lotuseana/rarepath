@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun --version)",
+      "Bash(git --version)",
+      "Bash(curl -fsSL https://bun.sh/install)",
+      "Bash(bash)",
+      "Bash(export BUN_INSTALL=\"$HOME/.bun\")",
+      "Bash(export PATH=\"$BUN_INSTALL/bin:$PATH\")",
+      "Bash(git clone:*)",
+      "Read(//c/Users/lotus/.claude/skills/gstack/**)",
+      "Bash(./setup)",
+      "Bash(bunx playwright:*)",
+      "Bash(export PATH=\"$HOME/.bun/bin:$PATH\")",
+      "Bash(bun x:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(cmd.exe /c \"mklink /J \"\"C:\\\\Users\\\\lotus\\\\.claude\\\\skills\\\\office-hours\"\" \"\"C:\\\\Users\\\\lotus\\\\.claude\\\\skills\\\\gstack\\\\office-hours\"\"\")",
+      "Bash(echo \"Exit: $?\")",
+      "Bash(powershell.exe -Command \"New-Item -ItemType Junction -Path ''C:\\\\Users\\\\lotus\\\\.claude\\\\skills\\\\office-hours'' -Target ''C:\\\\Users\\\\lotus\\\\.claude\\\\skills\\\\gstack\\\\office-hours''\")",
+      "Bash(powershell.exe -Command \"Get-ChildItem 'C:\\\\Users\\\\lotus\\\\.claude\\\\skills' | Select-Object Name, LinkType\" 2>&1)",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File \"C:\\\\Users\\\\lotus\\\\AppData\\\\Local\\\\Temp\\\\link-skills.ps1\" 2>&1)",
+      "Bash(powershell.exe -Command \"Get-ChildItem 'C:\\\\Users\\\\lotus\\\\.claude\\\\skills' | Select-Object -ExpandProperty Name\")",
+      "Bash(powershell.exe -Command \"Get-Item 'C:\\\\Users\\\\lotus\\\\.claude\\\\skills\\\\office-hours' | Select-Object LinkType, Target\" 2>&1)",
+      "Bash(python3 -c \"import json; d=json.load\\(open\\(''/root/hayward_hacks/data/hpo.json''\\)\\); print\\(''Keys:'', list\\(d.keys\\(\\)\\)[:5]\\)\")",
+      "Bash(python3 -c \"import json; d=json.load\\(open\\(open.__class__.__name__ and ''/c/Users/lotus/hayward_hacks/data/hpo.json''\\)\\); print\\(''Keys:'', list\\(d.keys\\(\\)\\)[:5]\\)\")",
+      "Bash(python3 build_index.py)",
+      "Bash(python3 -c \":*)",
+      "Bash(npm install:*)",
+      "Bash(python3 -m backend.federation)",
+      "Bash(B=~/.claude/skills/gstack/browse/dist/browse)",
+      "Bash($B goto:*)",
+      "Bash($B screenshot:*)",
+      "Bash(TMPZIP=\"$HOME/AppData/Local/Temp/chs-1208.zip\")",
+      "Bash(curl -L \"https://cdn.playwright.dev/dbazure/download/playwright/builds/chromium/1208/chromium-headless-shell-win64.zip\" -o \"$TMPZIP\")",
+      "Read(//c/Users/lotus/hayward_hacks/**)",
+      "Bash(npx vite:*)",
+      "Bash(npm run:*)"
+    ]
+  }
+}

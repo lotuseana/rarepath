@@ -1,0 +1,171 @@
+The Problem
+
+  - 300 million people worldwide live with a rare disease (defined as affecting <1 in 2,000 people)
+  - Average time to correct diagnosis: 5-7 years, often involving 7-8 misdiagnoses
+  - ~72% of rare diseases are genetic — meaning early detection can change outcomes dramatically
+  - 95% of rare diseases have no approved treatment — but diagnosis still matters for management, family planning, and clinical trial eligibility
+  - The brutal irony: rare diseases are collectively not rare — they affect more people than cancer
+
+  Why developing countries are worse off
+
+  - Most rare disease research and diagnostic tools are built for patients in the US/EU with access to genomic sequencing, specialist referrals, and comprehensive EHR systems
+  - In low/middle-income countries, a child with a rare metabolic disorder will almost certainly be misdiagnosed as malnourished or developmentally delayed — indefinitely
+  - Hospitals in these regions have tiny per-disease datasets — too small for any single hospital to train a useful model alone
+
+  ---
+  The Core Innovation: Federated Learning Across Sparse Data
+
+  This is the key technical differentiator. Instead of centralizing patient data (impossible due to privacy laws and hospital distrust), the model trains locally at each hospital and only shares encrypted
+   model weights.
+
+  Hospital A (50 patients)    Hospital B (30 patients)    Hospital C (80 patients)
+        |                           |                           |
+    Local Model                Local Model                Local Model
+        |                           |                           |
+        └───────────────────────────┴───────────────────────────┘
+                                    |
+                            Aggregated Global Model
+                            (no raw patient data ever leaves)
+                                    |
+                       Push updated weights back to hospitals
+
+  Each hospital improves the global model without exposing patient records. A hospital with only 12 cases of a specific enzyme deficiency contributes meaningfully when pooled with 15 others globally.
+
+  ---
+  What the System Actually Does
+
+  Input (what a clinician enters)
+
+  - Patient symptoms (free text or structured checklist)
+  - Basic lab values (CBC, metabolic panel — available even in low-resource settings)
+  - Physical exam findings (dysmorphic features, organ size, neurological signs)
+  - Family history
+  - Optionally: photos (for dysmorphology recognition via vision model)
+
+  Processing
+
+  1. Symptom encoder — maps clinical narrative to standardized HPO (Human Phenotype Ontology) terms using NLP
+  2. Differential generator — ranks candidate rare diseases by probability given the symptom profile
+  3. Confidence scoring — flags when more data (specific labs, genetics) would significantly change the ranking
+  4. Next-step recommender — tells the clinician exactly what to test next to narrow the diagnosis, prioritized by cost and local availability
+
+  Output
+
+  - Top 5-10 candidate diagnoses with probability scores
+  - Plain-language explanation of why each was flagged
+  - Suggested confirmatory tests, ordered by cost
+  - Links to clinical management guidelines (cached offline)
+  - Option to connect to a specialist network for teleconsultation
+
+  ---
+  Data Sources (all publicly accessible)
+
+  ┌────────────────────────────────────────────┬─────────────────────────────────────────────────────────────┐
+  │                   Source                   │                      What it provides                       │
+  ├────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ OMIM (Online Mendelian Inheritance in Man) │ 7,000+ rare diseases with genetic and clinical descriptions │
+  ├────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ Orphanet                                   │ European rare disease database, symptom-to-disease mappings │
+  ├────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ HPO (Human Phenotype Ontology)             │ Standardized symptom vocabulary for training                │
+  ├────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ ClinVar                                    │ Genetic variant-to-disease associations                     │
+  ├────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ NORD                                       │ Patient registry data (some public)                         │
+  ├────────────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ PhenomeCentral                             │ De-identified patient phenotype matching dataset            │
+  └────────────────────────────────────────────┴─────────────────────────────────────────────────────────────┘
+
+  For the hackathon, you can simulate federated nodes using subsets of these public datasets split across virtual "hospitals."
+
+  ---
+  Tech Stack
+
+  For a Hackathon Build (48hrs)
+
+  Frontend:      React or simple HTML (clinician-facing form)
+  Backend:       Python + FastAPI
+  NLP:           BioBERT or PubMedBERT (fine-tuned on HPO terms)
+                 — HuggingFace has pre-trained versions ready to use
+  Federated sim: Flower (flwr) — Python federated learning framework,
+                 surprisingly easy to mock with 3 local nodes
+  Differential:  Bayesian network over HPO-to-disease graph
+                 OR embedding similarity (symptom vector vs disease vectors)
+  Database:      SQLite for hackathon, PostgreSQL for real
+  Deployment:    Docker + any cloud (or localhost for demo)
+
+  For a Real Product
+
+  - Add FHIR integration (healthcare data standard) so it plugs into existing hospital systems
+  - Replace simulated federation with PySyft or TensorFlow Federated for production-grade privacy
+  - Add genomic input when sequencing is available (VCF file parsing)
+  - Mobile-first design for tablet use in clinics without desktops
+
+  ---
+  Hackathon Demo Flow
+
+  Show this live:
+
+  1. Clinician types: "4-year-old, progressive muscle weakness, difficulty climbing stairs, elevated CK levels, no family history"
+  2. System maps to HPO terms: HP:0003560 (muscular dystrophy), HP:0003236 (elevated CK), etc.
+  3. Returns: Duchenne Muscular Dystrophy (68%), Becker MD (14%), Pompe Disease (9%)...
+  4. Says: "Confirmatory test: dystrophin gene panel ($40-80). If unavailable, muscle biopsy."
+  5. Show the federated learning dashboard — 3 simulated hospital nodes, each with partial data, converging on a better model than any single node alone
+
+  That's a visceral, understandable demo that judges will remember.
+
+  ---
+  Business / Sustainability Model
+
+  This matters for AI entrepreneurship-focused hackathons:
+
+  ┌───────────────────────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │         Model         │                                                 Details                                                 │
+  ├───────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ B2B SaaS to hospitals │ Subscription per hospital, tiered by country income level                                               │
+  ├───────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Grant funding         │ WHO, Gates Foundation, Wellcome Trust all fund rare disease work                                        │
+  ├───────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Pharma partnerships   │ Drug companies pay for patient identification pipelines (rare disease trials struggle to find patients) │
+  ├───────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Government licensing  │ National health ministries in India, Brazil, Nigeria are actively digitizing health systems             │
+  └───────────────────────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+  The pharma angle is particularly strong — a rare disease drug can cost $100k+/year, so a company with an approved drug desperately needs to find the 1-in-50,000 patients who qualify. Your system is
+  their patient funnel.
+
+  ---
+  Competitive Landscape (why there's still a gap)
+
+  ┌──────────────────┬──────────────────────────────────────┬─────────────────────────────────────────────────────────────┐
+  │  Existing Tool   │             What it does             │                       What it misses                        │
+  ├──────────────────┼──────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ Isabel DDx       │ Symptom-to-diagnosis for generalists │ Not rare-disease specialized, no federated learning         │
+  ├──────────────────┼──────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ FDNA (Face2Gene) │ Facial dysmorphology recognition     │ Only works with photos, doesn't integrate clinical data     │
+  ├──────────────────┼──────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ Phenomizer       │ HPO-based rare disease matching      │ Research tool, not clinical workflow, no federated approach │
+  ├──────────────────┼──────────────────────────────────────┼─────────────────────────────────────────────────────────────┤
+  │ Mendelian.co     │ UK-based rare disease AI             │ Requires full EHR integration, not low-resource compatible  │
+  └──────────────────┴──────────────────────────────────────┴─────────────────────────────────────────────────────────────┘
+
+  Your niche: Low-resource settings + federated privacy + multi-modal input (symptoms + labs + photos) + actionable next steps
+
+  ---
+  Pitch Narrative (30-second version)
+
+  ▎ "A child in rural Nigeria shows signs of a metabolic disorder. The local doctor has seen one case like this in their career. Without help, this child gets diagnosed as 'failure to thrive' and sent
+  home. Our system pools knowledge from 200 hospitals across 40 countries — without any hospital sharing a single patient record — so that doctor gets a ranked differential diagnosis, a $30 confirmatory
+  test recommendation, and a telemedicine link to a specialist. We turn a 7-year diagnostic odyssey into a 7-day one."
+
+  ---
+  What Makes This Hackathon-Winnable
+
+  - Technical depth: Federated learning is impressive and real, not a gimmick
+  - Clear impact: Rare disease + developing world = unambiguous need
+  - Buildable in 48hrs: Public datasets, pre-trained NLP models, Flower for federation sim
+  - Strong business case: Multiple revenue paths, existing market validation
+  - Emotional story: Every rare disease patient has a harrowing diagnostic journey — easy to make judges feel the problem
+
+  ---
+  Want me to sketch out a specific 48-hour build plan with task breakdown, or work on the pitch deck structure?
