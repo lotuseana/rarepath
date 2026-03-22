@@ -1,0 +1,5 @@
+data/hpo.json
+data/orphanet_phenotypes.xml
+data/build_index.py
+frontend/node_modules
+__pycache__

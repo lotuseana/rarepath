@@ -8,9 +8,13 @@ Supported languages: English (en), Spanish (es), Hindi (hi)
 import os
 import base64
 from dotenv import load_dotenv
-from elevenlabs.client import ElevenLabs
 
 load_dotenv()
+
+try:
+    from elevenlabs.client import ElevenLabs
+except ImportError:
+    ElevenLabs = None
 
 # Multilingual v2 model supports EN, ES, HI and 28 other languages
 MODEL_ID = "eleven_multilingual_v2"
@@ -79,6 +83,8 @@ def synthesize(text: str, language: str = "en") -> str:
     Synthesize text to speech using ElevenLabs.
     Returns base64-encoded MP3 audio string.
     """
+    if ElevenLabs is None:
+        return ""
     client = ElevenLabs(api_key=os.getenv("ELEVENLABS_API_KEY"))
 
     # The multilingual v2 model matches pronunciation to the language of the input text.

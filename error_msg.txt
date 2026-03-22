@@ -1,0 +1,208 @@
+23:34:34.351 Running build in Washington, D.C., USA (East) – iad1
+23:34:34.351 Build machine configuration: 2 cores, 8 GB
+23:34:34.361 Cloning github.com/lotuseana/rarepath (Branch: main, Commit: 1da61c2)
+23:34:34.363 Skipping build cache, deployment was triggered without cache.
+23:34:36.146 Cloning completed: 1.784s
+23:34:36.564 Running "vercel build"
+23:34:37.233 Vercel CLI 50.35.0
+23:34:37.863 Installing dependencies...
+23:34:38.211 Using CPython 3.14.2
+23:34:38.480 Resolved 27 packages in 263ms
+23:34:38.496 Downloading rapidfuzz (3.0MiB)
+23:34:38.502 Downloading elevenlabs (1.4MiB)
+23:34:38.591  Downloaded rapidfuzz
+23:34:38.618    Building pydantic-core==2.23.4
+23:34:38.847  Downloaded elevenlabs
+23:34:47.394   × Failed to build `pydantic-core==2.23.4`
+23:34:47.395   ├─▶ The build backend returned an error
+23:34:47.396   ╰─▶ Call to `maturin.build_wheel` failed (exit status: 1)
+23:34:47.396 
+23:34:47.396       [stdout]
+23:34:47.396       Running `maturin pep517 build-wheel -i
+23:34:47.396       /vercel/.cache/uv/builds-v0/.tmpZbakUa/bin/python --compatibility off`
+23:34:47.397 
+23:34:47.397       [stderr]
+23:34:47.397           Updating crates.io index
+23:34:47.397        Downloading crates ...
+23:34:47.397         Downloaded jiter v0.5.0
+23:34:47.397         Downloaded serde_derive v1.0.209
+23:34:47.397         Downloaded yoke v0.7.4
+23:34:47.397         Downloaded zerofrom v0.1.4
+23:34:47.398         Downloaded synstructure v0.13.1
+23:34:47.398         Downloaded memoffset v0.9.1
+23:34:47.398         Downloaded writeable v0.5.5
+23:34:47.398         Downloaded idna v0.5.0
+23:34:47.398         Downloaded zerovec-derive v0.10.3
+23:34:47.398         Downloaded wyz v0.5.1
+23:34:47.398         Downloaded wasi v0.11.0+wasi-snapshot-preview1
+23:34:47.398         Downloaded num-traits v0.2.19
+23:34:47.398         Downloaded zerocopy v0.7.34
+23:34:47.398         Downloaded pyo3-ffi v0.22.2
+23:34:47.398         Downloaded lexical-parse-integer v0.8.6
+23:34:47.399         Downloaded serde v1.0.209
+23:34:47.399         Downloaded num-bigint v0.4.6
+23:34:47.399         Downloaded regex-syntax v0.8.4
+23:34:47.399         Downloaded zerovec v0.10.4
+23:34:47.399         Downloaded unicode-normalization v0.1.23
+23:34:47.400         Downloaded portable-atomic v1.6.0
+23:34:47.400         Downloaded serde_json v1.0.128
+23:34:47.400         Downloaded memchr v2.7.4
+23:34:47.400         Downloaded python3-dll-a v0.2.10
+23:34:47.400         Downloaded pyo3 v0.22.2
+23:34:47.400         Downloaded pyo3-macros-backend v0.22.2
+23:34:47.400         Downloaded syn v2.0.68
+23:34:47.400         Downloaded uuid v1.10.0
+23:34:47.401         Downloaded unicode-ident v1.0.12
+23:34:47.401         Downloaded unicode-bidi v0.3.15
+23:34:47.401         Downloaded tinystr v0.7.6
+23:34:47.401         Downloaded speedate v0.14.4
+23:34:47.401         Downloaded lexical-util v0.8.5
+23:34:47.401         Downloaded url v2.5.2
+23:34:47.401         Downloaded target-lexicon v0.12.14
+23:34:47.402         Downloaded strum_macros v0.26.4
+23:34:47.402         Downloaded smallvec v1.13.2
+23:34:47.402         Downloaded rustversion v1.0.17
+23:34:47.402         Downloaded quote v1.0.36
+23:34:47.402         Downloaded libc v0.2.155
+23:34:47.402         Downloaded pyo3-build-config v0.22.2
+23:34:47.402         Downloaded percent-encoding v2.3.1
+23:34:47.403         Downloaded zerofrom-derive v0.1.4
+23:34:47.403         Downloaded yoke-derive v0.7.4
+23:34:47.403         Downloaded write16 v1.0.0
+23:34:47.403         Downloaded tap v1.0.1
+23:34:47.404         Downloaded utf8_iter v1.0.4
+23:34:47.404         Downloaded itoa v1.0.11
+23:34:47.404         Downloaded icu_locid_transform v1.5.0
+23:34:47.404         Downloaded icu_collections v1.5.0
+23:34:47.404         Downloaded getrandom v0.2.15
+23:34:47.404         Downloaded zerocopy-derive v0.7.34
+23:34:47.404         Downloaded version_check v0.9.5
+23:34:47.405         Downloaded utf16_iter v1.0.5
+23:34:47.405         Downloaded unindent v0.2.3
+23:34:47.405         Downloaded strum v0.26.3
+23:34:47.405         Downloaded static_assertions v1.1.0
+23:34:47.405         Downloaded stable_deref_trait v1.2.0
+23:34:47.405         Downloaded ryu v1.0.18
+23:34:47.405         Downloaded regex v1.10.6
+23:34:47.406         Downloaded radium v0.7.0
+23:34:47.406         Downloaded pyo3-macros v0.22.2
+23:34:47.406         Downloaded once_cell v1.19.0
+23:34:47.406         Downloaded num-integer v0.1.46
+23:34:47.406         Downloaded litemap v0.7.3
+23:34:47.406         Downloaded lexical-parse-float v0.8.5
+23:34:47.406         Downloaded indoc v2.0.5
+23:34:47.406         Downloaded indexmap v2.2.6
+23:34:47.407         Downloaded idna v1.0.2
+23:34:47.407         Downloaded icu_provider v1.5.0
+23:34:47.407         Downloaded icu_properties_data v1.5.0
+23:34:47.407         Downloaded icu_properties v1.5.1
+23:34:47.407         Downloaded icu_locid_transform_data v1.5.0
+23:34:47.407         Downloaded icu_locid v1.5.0
+23:34:47.408         Downloaded hex v0.4.3
+23:34:47.408         Downloaded heck v0.5.0
+23:34:47.408         Downloaded funty v2.0.0
+23:34:47.408         Downloaded tinyvec_macros v0.1.1
+23:34:47.408         Downloaded tinyvec v1.6.1
+23:34:47.408         Downloaded regex-automata v0.4.7
+23:34:47.409         Downloaded proc-macro2 v1.0.86
+23:34:47.409         Downloaded icu_provider_macros v1.5.0
+23:34:47.409         Downloaded icu_normalizer_data v1.5.0
+23:34:47.409         Downloaded icu_normalizer v1.5.0
+23:34:47.409         Downloaded hashbrown v0.14.5
+23:34:47.410         Downloaded form_urlencoded v1.2.1
+23:34:47.410         Downloaded equivalent v1.0.1
+23:34:47.410         Downloaded displaydoc v0.2.5
+23:34:47.410         Downloaded cfg-if v1.0.0
+23:34:47.410         Downloaded cc v1.0.101
+23:34:47.410         Downloaded bitvec v1.0.1
+23:34:47.411         Downloaded base64 v0.22.1
+23:34:47.411         Downloaded autocfg v1.3.0
+23:34:47.411         Downloaded aho-corasick v1.1.3
+23:34:47.411         Downloaded ahash v0.8.11
+23:34:47.411         Downloaded enum_dispatch v0.3.13
+23:34:47.412       📦 Including license file `LICENSE`
+23:34:47.412       🍹 Building a mixed python/rust project
+23:34:47.412       🔗 Found pyo3 bindings
+23:34:47.412       🐍 Found CPython 3.14 at
+23:34:47.412       /vercel/.cache/uv/builds-v0/.tmpZbakUa/bin/python
+23:34:47.412       📡 Using build options features, bindings from pyproject.toml
+23:34:47.413          Compiling proc-macro2 v1.0.86
+23:34:47.413          Compiling unicode-ident v1.0.12
+23:34:47.413          Compiling target-lexicon v0.12.14
+23:34:47.413          Compiling python3-dll-a v0.2.10
+23:34:47.413          Compiling pyo3-build-config v0.22.2
+23:34:47.413          Compiling quote v1.0.36
+23:34:47.414          Compiling syn v2.0.68
+23:34:47.414          Compiling once_cell v1.19.0
+23:34:47.414          Compiling stable_deref_trait v1.2.0
+23:34:47.414          Compiling autocfg v1.3.0
+23:34:47.414          Compiling heck v0.5.0
+23:34:47.415          Compiling libc v0.2.155
+23:34:47.415          Compiling num-traits v0.2.19
+23:34:47.415          Compiling writeable v0.5.5
+23:34:47.415          Compiling litemap v0.7.3
+23:34:47.415          Compiling version_check v0.9.5
+23:34:47.415          Compiling synstructure v0.13.1
+23:34:47.416          Compiling pyo3-macros-backend v0.22.2
+23:34:47.416          Compiling pyo3-ffi v0.22.2
+23:34:47.416          Compiling rustversion v1.0.17
+23:34:47.416       error: failed to run custom build command for `pyo3-ffi v0.22.2`
+23:34:47.416 
+23:34:47.416       Caused by:
+23:34:47.417         process didn't exit successfully:
+23:34:47.417       `/vercel/.cache/uv/sdists-v9/pypi/pydantic-core/2.23.4/kRxQHX24WQP4-Gil7F96S/src/target/release/build/pyo3-ffi-2082529146f74773/build-script-build`
+23:34:47.417       (exit status: 1)
+23:34:47.417         --- stdout
+23:34:47.417         cargo:rustc-check-cfg=cfg(Py_LIMITED_API)
+23:34:47.417         cargo:rustc-check-cfg=cfg(PyPy)
+23:34:47.417         cargo:rustc-check-cfg=cfg(GraalPy)
+23:34:47.418         cargo:rustc-check-cfg=cfg(py_sys_config, values("Py_DEBUG",
+23:34:47.418       "Py_REF_DEBUG", "Py_TRACE_REFS", "COUNT_ALLOCS"))
+23:34:47.418         cargo:rustc-check-cfg=cfg(invalid_from_utf8_lint)
+23:34:47.418         cargo:rustc-check-cfg=cfg(pyo3_disable_reference_pool)
+23:34:47.419         cargo:rustc-check-cfg=cfg(pyo3_leak_on_drop_without_reference_pool)
+23:34:47.419         cargo:rustc-check-cfg=cfg(diagnostic_namespace)
+23:34:47.419         cargo:rustc-check-cfg=cfg(c_str_lit)
+23:34:47.419         cargo:rustc-check-cfg=cfg(Py_3_7)
+23:34:47.419         cargo:rustc-check-cfg=cfg(Py_3_8)
+23:34:47.419         cargo:rustc-check-cfg=cfg(Py_3_9)
+23:34:47.419         cargo:rustc-check-cfg=cfg(Py_3_10)
+23:34:47.419         cargo:rustc-check-cfg=cfg(Py_3_11)
+23:34:47.419         cargo:rustc-check-cfg=cfg(Py_3_12)
+23:34:47.419         cargo:rustc-check-cfg=cfg(Py_3_13)
+23:34:47.420         cargo:rerun-if-env-changed=PYO3_CROSS
+23:34:47.420         cargo:rerun-if-env-changed=PYO3_CROSS_LIB_DIR
+23:34:47.420         cargo:rerun-if-env-changed=PYO3_CROSS_PYTHON_VERSION
+23:34:47.420         cargo:rerun-if-env-changed=PYO3_CROSS_PYTHON_IMPLEMENTATION
+23:34:47.420         cargo:rerun-if-env-changed=PYO3_PRINT_CONFIG
+23:34:47.420         cargo:rerun-if-env-changed=PYO3_USE_ABI3_FORWARD_COMPATIBILITY
+23:34:47.420 
+23:34:47.420         --- stderr
+23:34:47.421         error: the configured Python interpreter version (3.14) is newer than
+23:34:47.421       PyO3's maximum supported version (3.13)
+23:34:47.421         = help: please check if an updated version of PyO3 is available.
+23:34:47.421       Current version: 0.22.2
+23:34:47.421         = help: set PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1 to suppress this
+23:34:47.421       check and build anyway using the stable ABI
+23:34:47.422       warning: build failed, waiting for other jobs to finish...
+23:34:47.422       💥 maturin failed
+23:34:47.422         Caused by: Failed to build a native library through cargo
+23:34:47.422         Caused by: Cargo build finished with "exit status:
+23:34:47.422       101": `env -u CARGO PYO3_BUILD_EXTENSION_MODULE="1"
+23:34:47.423       PYO3_ENVIRONMENT_SIGNATURE="cpython-3.14-64bit"
+23:34:47.423       PYO3_PYTHON="/vercel/.cache/uv/builds-v0/.tmpZbakUa/bin/python"
+23:34:47.423       PYTHON_SYS_EXECUTABLE="/vercel/.cache/uv/builds-v0/.tmpZbakUa/bin/python"
+23:34:47.423       "cargo" "rustc" "--profile" "release" "--features"
+23:34:47.423       "pyo3/extension-module" "--message-format"
+23:34:47.423       "json-render-diagnostics" "--manifest-path"
+23:34:47.423       "/vercel/.cache/uv/sdists-v9/pypi/pydantic-core/2.23.4/kRxQHX24WQP4-Gil7F96S/src/Cargo.toml"
+23:34:47.423       "--lib" "--crate-type" "cdylib"`
+23:34:47.424       Error: command ['maturin', 'pep517', 'build-wheel', '-i',
+23:34:47.424       '/vercel/.cache/uv/builds-v0/.tmpZbakUa/bin/python', '--compatibility',
+23:34:47.425       'off'] returned non-zero exit status 1
+23:34:47.425 
+23:34:47.425       hint: This usually indicates a problem with the package or the build
+23:34:47.425       environment.
+23:34:47.425   help: `pydantic-core` (v2.23.4) was included because `elevenlabs` (v2.39.0)
+23:34:47.425         depends on `pydantic-core`
+23:34:47.428 Error: Command "uv pip install" exited with 1
