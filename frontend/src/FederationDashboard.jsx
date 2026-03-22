@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, useCallback } from 'react'
 import axios from 'axios'
 import './Federation.css'
 
-const BASE = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:8003' : '')
+const BASE = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:8005' : '')
 const PHASE_MS = 280
 
 // ── Network Topology SVG ───────────────────────────────────────────────

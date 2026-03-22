@@ -5,11 +5,14 @@ Routes:
   POST /api/diagnose       — full diagnostic pipeline
   GET  /api/hpo/search     — HPO fuzzy match (for frontend autocomplete)
   GET  /api/health         — health check
+  POST /api/omi/memory     — Omi memory webhook (conversation ended)
+  POST /api/omi/transcript — Omi real-time transcript webhook
+  GET  /api/omi/latest     — poll latest Omi-captured symptoms
 """
 
 import asyncio
 import time
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -121,43 +124,19 @@ async def diagnose(req: DiagnoseRequest):
             detail="Diagnosis timed out after 20 seconds. Please try again."
         )
 
-    # Step 3: generate voice summaries in parallel (EN + ES)
-    # Failures are non-blocking — diagnosis still returns without audio
     candidates = result.get("candidates", [])
     uncertainty_note = result.get("uncertainty_note", "")
     audio_en = audio_es = None
 
-    # Step 4: fire voice + research in parallel — both non-blocking
+    # Fire research in parallel — non-blocking
     research = None
     top_disease = candidates[0].get("disease", "") if candidates else ""
 
-    async def get_voice():
-        nonlocal audio_en, audio_es
-        if not candidates or not os.getenv("ELEVENLABS_API_KEY"):
-            return
-        summary_en_text = build_summary(candidates, uncertainty_note)
-        summary_es_text = await asyncio.get_event_loop().run_in_executor(
-            None, translate_summary, summary_en_text
-        )
-        try:
-            a_en, a_es = await asyncio.gather(
-                asyncio.get_event_loop().run_in_executor(None, synthesize, summary_en_text, "en"),
-                asyncio.get_event_loop().run_in_executor(None, synthesize, summary_es_text, "es"),
-            )
-            audio_en, audio_es = a_en, a_es
-        except Exception:
-            pass
-
-    async def get_research():
-        nonlocal research
-        if not top_disease or not os.getenv("PERPLEXITY_API_KEY"):
-            return
+    if top_disease and os.getenv("PERPLEXITY_API_KEY"):
         try:
             research = await fetch_research(top_disease) or None
         except Exception:
             pass
-
-    await asyncio.gather(get_voice(), get_research())
 
     return DiagnoseResponse(
         hpo_terms=[HPOTerm(**t) for t in hpo_terms],
@@ -170,3 +149,159 @@ async def diagnose(req: DiagnoseRequest):
         latency_ms=int((time.time() - start) * 1000),
         provider=os.getenv("LLM_PROVIDER", "groq"),
     )
+
+
+# ── Omi Integration ──────────────────────────────────────────────────────────
+# Stores the latest Omi-captured transcript per user so the frontend can poll it.
+
+_omi_store: dict[str, dict] = {}
+
+
+# ── On-demand Voice ──────────────────────────────────────────────────────
+
+class VoiceRequest(BaseModel):
+    candidates: list[dict]
+    uncertainty_note: str = ""
+    language: str = "en"  # en, es, hi, fr, de, pt, zh, ja, ko, ar
+
+
+LANGUAGE_NAMES = {
+    "en": "English", "es": "Spanish", "hi": "Hindi",
+    "fr": "French", "de": "German", "pt": "Portuguese",
+    "zh": "Chinese", "ja": "Japanese", "ko": "Korean", "ar": "Arabic",
+}
+
+
+@app.post("/api/voice")
+async def generate_voice(req: VoiceRequest):
+    """Generate audio briefing on demand for a selected language."""
+    if not os.getenv("ELEVENLABS_API_KEY"):
+        raise HTTPException(status_code=503, detail="ElevenLabs API key not configured")
+    if not req.candidates:
+        raise HTTPException(status_code=400, detail="No candidates provided")
+
+    summary_en = build_summary(req.candidates, req.uncertainty_note)
+
+    if req.language == "en":
+        text = summary_en
+    else:
+        lang_name = LANGUAGE_NAMES.get(req.language, req.language)
+        text = await asyncio.get_event_loop().run_in_executor(
+            None, translate_summary, summary_en, lang_name
+        )
+
+    try:
+        audio = await asyncio.get_event_loop().run_in_executor(
+            None, synthesize, text, req.language
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Voice synthesis failed: {str(e)}")
+
+    return {
+        "audio": audio,
+        "language": req.language,
+        "language_name": LANGUAGE_NAMES.get(req.language, req.language),
+    }
+
+
+@app.get("/api/voice/languages")
+def voice_languages():
+    """List available voice languages."""
+    return {"languages": [
+        {"code": k, "name": v} for k, v in LANGUAGE_NAMES.items()
+    ]}
+
+
+# ── Omi Integration ──────────────────────────────────────────────────────────
+
+@app.post("/api/omi/memory")
+async def omi_memory_webhook(request: Request, uid: str = "default"):
+    """
+    Omi Memory webhook — fires when a conversation ends.
+    Extracts the full transcript and maps symptoms via HPO.
+    """
+    body = await request.json()
+    segments = body.get("transcript_segments", [])
+    if not segments:
+        return {"message": "no transcript"}
+
+    full_text = " ".join(seg.get("text", "") for seg in segments)
+    hpo_terms = match_symptoms_to_hpo(full_text)
+
+    entry = {
+        "source": "omi_memory",
+        "transcript": full_text,
+        "symptoms": ", ".join(t["label"] for t in hpo_terms),
+        "hpo_terms": hpo_terms,
+        "timestamp": time.time(),
+    }
+    _omi_store[uid] = entry
+    _omi_store["default"] = entry
+    return {"message": f"Captured {len(hpo_terms)} symptoms from conversation"}
+
+
+@app.post("/api/omi/transcript")
+async def omi_realtime_webhook(request: Request, uid: str = "default", session_id: str = ""):
+    """
+    Omi Real-time Transcript webhook — fires as the user speaks.
+    Accumulates segments and continuously maps symptoms.
+    """
+    body = await request.json()
+
+    # Handle all formats: list of segments, dict with segments/transcript_segments
+    if isinstance(body, dict):
+        segments = body.get("segments", body.get("transcript_segments", []))
+        if not segments and body.get("text"):
+            segments = [{"text": body["text"]}]
+        # session_id may be in the body
+        if not session_id:
+            session_id = body.get("session_id", "")
+    elif isinstance(body, list):
+        segments = body
+    else:
+        return {"message": "no segments"}
+
+    if not segments:
+        return {"message": "no segments"}
+
+    new_text = " ".join(seg.get("text", "") for seg in segments)
+
+    # Accumulate within the same session — append to existing transcript
+    existing = _omi_store.get("default", {})
+    if existing.get("session_id") == session_id and session_id:
+        prev = existing.get("transcript", "")
+        full_text = f"{prev} {new_text}".strip()
+    else:
+        full_text = new_text
+
+    hpo_terms = match_symptoms_to_hpo(full_text)
+
+    entry = {
+        "source": "omi_realtime",
+        "session_id": session_id,
+        "transcript": full_text,
+        "symptoms": ", ".join(t["label"] for t in hpo_terms),
+        "hpo_terms": hpo_terms,
+        "timestamp": time.time(),
+    }
+    _omi_store[uid] = entry
+    _omi_store["default"] = entry
+    return {"message": f"Processing — {len(hpo_terms)} symptoms detected so far"}
+
+
+
+@app.post("/api/omi/reset")
+def omi_reset(uid: str = "default"):
+    """Clear stored Omi data for a fresh conversation."""
+    _omi_store.pop(uid, None)
+    _omi_store.pop("default", None)
+    return {"message": "Omi data cleared"}
+
+
+@app.get("/api/omi/latest")
+def omi_latest(uid: str = "default"):
+    """Poll the latest Omi-captured symptoms for the frontend."""
+    data = _omi_store.get(uid)
+    if not data:
+        return {"available": False}
+    return {"available": True, **data}

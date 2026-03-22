@@ -6,13 +6,13 @@ Rare disease diagnostic assistant. 4-person team, 24-hour hackathon.
 
 ```bash
 # Backend (from project root)
-python3 -m uvicorn backend.main:app --port 8003 --reload
+python3 -m uvicorn backend.main:app --port 8005 --reload
 
 # Frontend
 cd frontend && npm run dev
 ```
 
-**Important:** Ports 8000–8002 are occupied by dead processes from earlier in the hackathon. Always use port 8003. Frontend BASE is hardcoded to `http://localhost:8003` in `frontend/src/api.js` and `FederationDashboard.jsx`.
+**Important:** Ports 8000–8003 are occupied by dead processes from earlier in the hackathon. Always use port 8005. Frontend BASE is hardcoded to `http://localhost:8005` in `frontend/src/api.js` and `FederationDashboard.jsx`.
 
 ## Architecture
 

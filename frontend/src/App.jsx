@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { diagnose, searchHPO } from './api'
+import { diagnose, searchHPO, fetchOmiLatest, resetOmi, generateVoice } from './api'
 import FederationDashboard from './FederationDashboard'
 import './App.css'
 
@@ -64,6 +64,19 @@ const DEMO_CASES = [
   },
 ]
 
+const VOICE_LANGUAGES = [
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'es', name: 'Spanish', flag: '🇪🇸' },
+  { code: 'hi', name: 'Hindi', flag: '🇮🇳' },
+  { code: 'fr', name: 'French', flag: '🇫🇷' },
+  { code: 'de', name: 'German', flag: '🇩🇪' },
+  { code: 'pt', name: 'Portuguese', flag: '🇧🇷' },
+  { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
+  { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
+  { code: 'ko', name: 'Korean', flag: '🇰🇷' },
+  { code: 'ar', name: 'Arabic', flag: '🇸🇦' },
+]
+
 const LOADING_STAGES = [
   'Mapping symptoms to HPO ontology',
   'Cross-referencing 4,335 rare diseases',
@@ -81,6 +94,15 @@ export default function App() {
   const [error, setError] = useState(null)
   const [compareMode, setCompareMode] = useState(false)
   const [compareSelection, setCompareSelection] = useState([])
+
+  // Voice state
+  const [voiceAudios, setVoiceAudios] = useState({}) // { lang_code: base64 }
+  const [voiceLoading, setVoiceLoading] = useState(null) // lang code currently loading
+
+  // Omi wearable state
+  const [omiPolling, setOmiPolling] = useState(false)
+  const [omiData, setOmiData] = useState(null)
+  const omiIntervalRef = useRef(null)
 
   // HPO autocomplete state
   const [hpoQuery, setHpoQuery] = useState('')
@@ -146,6 +168,53 @@ export default function App() {
     }
   }
 
+  // Omi polling
+  const startOmiPolling = () => {
+    if (omiPolling) {
+      // Stop polling
+      clearInterval(omiIntervalRef.current)
+      omiIntervalRef.current = null
+      setOmiPolling(false)
+      return
+    }
+    setOmiPolling(true)
+    setOmiData(null)
+    const poll = async () => {
+      try {
+        const data = await fetchOmiLatest()
+        if (data.available) {
+          setOmiData(data)
+        }
+      } catch { /* ignore */ }
+    }
+    poll()
+    omiIntervalRef.current = setInterval(poll, 3000)
+  }
+
+  const importOmiSymptoms = () => {
+    if (!omiData) return
+    // Use detected symptoms if available, otherwise use raw transcript
+    const toImport = omiData.symptoms || omiData.transcript || ''
+    if (!toImport) return
+    setForm((f) => ({
+      ...f,
+      symptoms: f.symptoms
+        ? `${f.symptoms}, ${toImport}`
+        : toImport,
+    }))
+    // Stop polling after import
+    clearInterval(omiIntervalRef.current)
+    omiIntervalRef.current = null
+    setOmiPolling(false)
+  }
+
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (omiIntervalRef.current) clearInterval(omiIntervalRef.current)
+    }
+  }, [])
+
   const set = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }))
 
   const submit = async (e) => {
@@ -156,6 +225,8 @@ export default function App() {
     setResult(null)
     setCompareMode(false)
     setCompareSelection([])
+    setVoiceAudios({})
+    setVoiceLoading(null)
 
     // Stage 0 (HPO mapping) completes quickly — advance after 400ms
     // Stage 1 (cross-referencing) advances after another 600ms
@@ -197,12 +268,34 @@ export default function App() {
     setSelectedHPO([])
     setCompareMode(false)
     setCompareSelection([])
+    setVoiceAudios({})
+    setVoiceLoading(null)
+    // Reset Omi
+    if (omiIntervalRef.current) clearInterval(omiIntervalRef.current)
+    omiIntervalRef.current = null
+    setOmiPolling(false)
+    setOmiData(null)
+    resetOmi().catch(() => {})
   }
 
   const toggleCompare = (idx) => {
     setCompareSelection((prev) =>
       prev.includes(idx) ? prev.filter((i) => i !== idx) : prev.length < 3 ? [...prev, idx] : prev
     )
+  }
+
+  const requestVoice = async (langCode) => {
+    if (voiceAudios[langCode] || voiceLoading) return
+    setVoiceLoading(langCode)
+    try {
+      const data = await generateVoice({
+        candidates: result.candidates,
+        uncertainty_note: result.uncertainty_note,
+        language: langCode,
+      })
+      setVoiceAudios((prev) => ({ ...prev, [langCode]: data.audio }))
+    } catch { /* ignore */ }
+    setVoiceLoading(null)
   }
 
   const generatePDF = () => {
@@ -278,6 +371,11 @@ export default function App() {
 
   /* Research */
   .research-content{font-size:12px;color:#475569;line-height:1.6;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:14px 16px}
+  .research-md h2,.research-md h3,.research-md h4{font-size:11px;font-weight:800;color:#0d9488;text-transform:uppercase;letter-spacing:0.08em;margin:14px 0 6px;padding-top:10px;border-top:1px solid #e2e8f0}
+  .research-md h2:first-child,.research-md h3:first-child,.research-md h4:first-child{margin-top:0;padding-top:0;border-top:none}
+  .research-md p{font-size:12px;color:#475569;line-height:1.65;margin:4px 0}
+  .research-md li{font-size:12px;color:#475569;line-height:1.65;margin:3px 0;padding-left:10px;border-left:2px solid #cbd5e1;list-style:none}
+  .research-md strong{color:#1e293b;font-weight:700}
   .citations{margin-top:10px;display:flex;flex-wrap:wrap;gap:4px}
   .cite{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:#0d9488;background:#f0fdfa;border:1px solid #ccfbf1;border-radius:3px;padding:2px 8px;text-decoration:none;font-weight:600}
   .cite:hover{background:#ccfbf1}
@@ -425,8 +523,8 @@ ${result.uncertainty_note ? `<div class="alert-box amber">
 <!-- Research -->
 ${result.research?.summary ? `<div class="section">
   <div class="section-title">Literature Review — ${result.research.disease}</div>
-  <div class="research-content">
-    ${result.research.summary.replace(/\n/g, '<br>')}
+  <div class="research-content research-md">
+    ${renderMarkdown(result.research.summary)}
     ${result.research.citations?.length ? `<div class="citations">
       ${result.research.citations.map((u, i) => `<a class="cite" href="${u}" target="_blank">[${i + 1}] ${(() => { try { return new URL(u).hostname.replace('www.','') } catch { return 'source' } })()}</a>`).join('')}
     </div>` : ''}
@@ -593,6 +691,58 @@ ${result.research?.summary ? `<div class="section">
                     required
                     className="symptoms-textarea"
                   />
+
+                  {/* Omi Wearable Integration */}
+                  <div className="omi-section">
+                    <button
+                      type="button"
+                      className={`omi-btn ${omiPolling ? 'omi-btn-active' : ''}`}
+                      onClick={startOmiPolling}
+                    >
+                      <svg className="omi-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                        <line x1="12" y1="19" x2="12" y2="23" />
+                        <line x1="8" y1="23" x2="16" y2="23" />
+                      </svg>
+                      {omiPolling ? 'Listening via Omi…' : 'Connect Omi Wearable'}
+                      {omiPolling && <span className="omi-pulse" />}
+                    </button>
+
+                    {omiPolling && !omiData && (
+                      <div className="omi-status">
+                        <div className="omi-waiting">
+                          <div className="spinner" style={{ width: 12, height: 12, borderWidth: 2 }} />
+                          Waiting for Omi device — speak symptoms aloud…
+                        </div>
+                      </div>
+                    )}
+
+                    {omiData && (
+                      <div className="omi-captured">
+                        <div className="omi-captured-header">
+                          <span className="omi-captured-label">
+                            Captured from Omi
+                            <span className="omi-source-badge">{omiData.source === 'omi_realtime' ? 'Live' : 'Memory'}</span>
+                          </span>
+                          <button
+                            type="button"
+                            className="omi-import-btn"
+                            onClick={importOmiSymptoms}
+                          >
+                            Import Symptoms
+                          </button>
+                        </div>
+                        <div className="omi-transcript">{omiData.transcript}</div>
+                        {omiData.symptoms && (
+                          <div className="omi-symptoms">
+                            <span className="omi-symptoms-label">Detected:</span>
+                            {omiData.symptoms}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="field">
@@ -704,16 +854,32 @@ ${result.research?.summary ? `<div class="section">
                 <div className="results-divider" />
 
                 {/* Comparison Mode */}
-                {compareMode && compareSelection.length >= 2 && (
-                  <div className="compare-panel">
-                    <div className="section-label">Side-by-Side Comparison</div>
-                    <div className="compare-grid" style={{ gridTemplateColumns: `repeat(${compareSelection.length}, 1fr)` }}>
-                      {compareSelection.map((idx) => {
-                        const c = result.candidates[idx]
-                        return (
-                          <div key={idx} className="compare-card">
+                {compareMode && compareSelection.length >= 2 && (() => {
+                  const selected = compareSelection.map((idx) => result.candidates[idx])
+                  const maxProb = Math.max(...selected.map(c => c.probability))
+                  return (
+                    <div className="compare-panel">
+                      <div className="section-label">Side-by-Side Comparison</div>
+
+                      {/* Probability comparison */}
+                      <div className="compare-prob-bars">
+                        {selected.map((c, i) => (
+                          <div key={i} className="compare-prob-row">
+                            <span className="compare-prob-name">{c.disease}</span>
+                            <div className="compare-prob-track">
+                              <div className="compare-prob-fill" style={{ width: `${(c.probability / maxProb) * 100}%` }} />
+                            </div>
+                            <span className="compare-prob-val">{c.probability}%</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Detail cards */}
+                      <div className="compare-grid" style={{ gridTemplateColumns: `repeat(${compareSelection.length}, 1fr)` }}>
+                        {selected.map((c, i) => (
+                          <div key={i} className="compare-card">
                             <div className="compare-card-header">
-                              <span className="compare-rank">#{idx + 1}</span>
+                              <span className="compare-rank">#{compareSelection[i] + 1}</span>
                               <span className="compare-prob">{c.probability}%</span>
                             </div>
                             <div className="compare-disease">{c.disease}</div>
@@ -726,12 +892,12 @@ ${result.research?.summary ? `<div class="section">
                               </div>
                             )}
                           </div>
-                        )
-                      })}
+                        ))}
+                      </div>
+                      <div className="results-divider" />
                     </div>
-                    <div className="results-divider" />
-                  </div>
-                )}
+                  )
+                })()}
                 {compareMode && compareSelection.length < 2 && (
                   <div className="compare-hint">
                     Select {2 - compareSelection.length} more candidate{compareSelection.length === 0 ? 's' : ''} to compare
@@ -826,25 +992,34 @@ ${result.research?.summary ? `<div class="section">
                 )}
 
                 {/* Voice briefing */}
-                {(result.audio_en || result.audio_es) && (
-                  <div className="voice-section">
-                    <div className="section-label">Audio Briefing</div>
-                    <div className="voice-players">
-                      {result.audio_en && (
-                        <div className="voice-player">
-                          <span className="voice-lang">🇺🇸 English</span>
-                          <audio controls src={`data:audio/mp3;base64,${result.audio_en}`} />
-                        </div>
-                      )}
-                      {result.audio_es && (
-                        <div className="voice-player">
-                          <span className="voice-lang">🇪🇸 Spanish</span>
-                          <audio controls src={`data:audio/mp3;base64,${result.audio_es}`} />
-                        </div>
-                      )}
-                    </div>
+                <div className="voice-section">
+                  <div className="section-label">Audio Briefing</div>
+                  <div className="voice-lang-grid">
+                    {VOICE_LANGUAGES.map((lang) => (
+                      <button
+                        key={lang.code}
+                        type="button"
+                        className={`voice-lang-btn ${voiceAudios[lang.code] ? 'voice-lang-ready' : ''} ${voiceLoading === lang.code ? 'voice-lang-loading' : ''}`}
+                        onClick={() => requestVoice(lang.code)}
+                        disabled={!!voiceLoading}
+                      >
+                        <span className="voice-lang-flag">{lang.flag}</span>
+                        <span className="voice-lang-name">{lang.name}</span>
+                        {voiceLoading === lang.code && <div className="spinner" style={{ width: 10, height: 10, borderWidth: 1.5 }} />}
+                        {voiceAudios[lang.code] && <span className="voice-lang-check">✓</span>}
+                      </button>
+                    ))}
                   </div>
-                )}
+                  {Object.entries(voiceAudios).map(([code, audio]) => {
+                    const lang = VOICE_LANGUAGES.find(l => l.code === code)
+                    return (
+                      <div key={code} className="voice-player">
+                        <span className="voice-lang">{lang?.flag} {lang?.name}</span>
+                        <audio controls src={`data:audio/mp3;base64,${audio}`} />
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
             )}
           </section>

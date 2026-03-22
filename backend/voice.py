@@ -63,18 +63,17 @@ def build_summary(candidates: list[dict], uncertainty_note: str = "") -> str:
     return " ".join(lines)
 
 
-def translate_summary(english_text: str) -> str:
-    """Translate the English clinical summary to Spanish using the configured LLM."""
+def translate_summary(english_text: str, target_language: str = "Spanish") -> str:
+    """Translate the English clinical summary to the target language using the configured LLM."""
     from .llm import get_diagnosis
     prompt = (
-        "Translate the following clinical summary to Spanish. "
+        f"Translate the following clinical summary to {target_language}. "
         "Return ONLY the translated text, no explanations or notes.\n\n"
         f"{english_text}"
     )
     try:
         return get_diagnosis(prompt)
     except Exception:
-        # Fallback: basic Spanish template
         return english_text
 
 
