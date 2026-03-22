@@ -64,7 +64,13 @@ class DiagnoseResponse(BaseModel):
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok"}
+    return {
+        "status": "ok",
+        "llm_provider": os.getenv("LLM_PROVIDER", "NOT SET"),
+        "groq_key": "set" if os.getenv("GROQ_API_KEY") else "MISSING",
+        "perplexity_key": "set" if os.getenv("PERPLEXITY_API_KEY") else "MISSING",
+        "elevenlabs_key": "set" if os.getenv("ELEVENLABS_API_KEY") else "MISSING",
+    }
 
 
 @app.get("/api/federation")
