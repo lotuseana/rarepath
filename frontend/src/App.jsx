@@ -3,6 +3,34 @@ import { diagnose, searchHPO } from './api'
 import FederationDashboard from './FederationDashboard'
 import './App.css'
 
+function renderMarkdown(md) {
+  const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  return md.split('\n').map(line => {
+    // Headers
+    if (line.startsWith('### ')) return `<h4>${esc(line.slice(4))}</h4>`
+    if (line.startsWith('## '))  return `<h3>${esc(line.slice(3))}</h3>`
+    if (line.startsWith('# '))   return `<h2>${esc(line.slice(2))}</h2>`
+    // Bullet points
+    if (/^[-*]\s/.test(line)) {
+      let inner = esc(line.slice(2))
+      inner = inner.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      return `<li>${inner}</li>`
+    }
+    // Numbered lists
+    if (/^\d+\.\s/.test(line)) {
+      let inner = esc(line.replace(/^\d+\.\s/, ''))
+      inner = inner.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      return `<li>${inner}</li>`
+    }
+    // Empty line
+    if (!line.trim()) return ''
+    // Regular paragraph with bold
+    let text = esc(line)
+    text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    return `<p>${text}</p>`
+  }).join('')
+}
+
 const DEMO_CASES = [
   {
     name: 'Duchenne Muscular Dystrophy',
@@ -782,19 +810,14 @@ ${result.research?.summary ? `<div class="section">
                 {result.research?.summary && (
                   <div className="research-section">
                     <div className="section-label">Live Research — {result.research.disease}</div>
-                    <div className="research-body">
-                      {result.research.summary.split('\n').filter(Boolean).map((line, i) => (
-                        <p key={i} className={line.startsWith('###') ? 'research-heading' : 'research-line'}>
-                          {line.replace(/^###\s*/, '')}
-                        </p>
-                      ))}
-                    </div>
+                    <div className="research-body research-md"
+                      dangerouslySetInnerHTML={{ __html: renderMarkdown(result.research.summary) }} />
                     {result.research.citations?.length > 0 && (
                       <div className="research-citations">
                         <span className="citations-label">Sources:</span>
                         {result.research.citations.map((url, i) => (
                           <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="citation-link">
-                            [{i + 1}]
+                            [{i + 1}] {(() => { try { return new URL(url).hostname.replace('www.', '') } catch { return 'source' } })()}
                           </a>
                         ))}
                       </div>

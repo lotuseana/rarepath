@@ -892,25 +892,41 @@ body {
   gap: 8px;
 }
 
-.research-heading {
-  font-size: 9.5px;
+.research-md h2, .research-md h3, .research-md h4 {
+  font-size: 10px;
   font-weight: 800;
   color: var(--text-2);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  margin-top: 10px;
+  margin: 12px 0 6px;
   padding-top: 10px;
   border-top: 1px solid var(--border);
 }
 
-.research-heading:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+.research-md h2:first-child,
+.research-md h3:first-child,
+.research-md h4:first-child { margin-top: 0; padding-top: 0; border-top: none; }
 
-.research-line {
+.research-md p {
   font-size: 12.5px;
   color: var(--text-2);
   line-height: 1.7;
+  margin: 4px 0;
+}
+
+.research-md li {
+  font-size: 12.5px;
+  color: var(--text-2);
+  line-height: 1.7;
+  margin: 3px 0;
   padding-left: 10px;
   border-left: 2px solid var(--border-2);
+  list-style: none;
+}
+
+.research-md strong {
+  color: var(--text);
+  font-weight: 700;
 }
 
 .research-citations {
