@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RarePath — 1-Minute Pitch</title>
+<style>
+  @page { size: A4; margin: 22mm 20mm; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: #1e293b;
+    line-height: 1.8;
+    font-size: 15px;
+    background: #fff;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 48px 36px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 36px;
+    padding-bottom: 20px;
+    border-bottom: 2.5px solid #0d9488;
+  }
+  h1 {
+    font-size: 30px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.5px;
+  }
+  .subtitle {
+    font-size: 12px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  .beat {
+    margin-bottom: 24px;
+    page-break-inside: avoid;
+  }
+
+  .label {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 800;
+    color: #0d9488;
+    background: #f0fdfa;
+    border: 1px solid #ccfbf1;
+    border-radius: 4px;
+    padding: 2px 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+
+  .line {
+    font-size: 15px;
+    color: #1e293b;
+    line-height: 1.85;
+  }
+
+  .stat {
+    font-weight: 700;
+    color: #0d9488;
+  }
+
+  .closer {
+    margin-top: 40px;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #f0fdfa, #ecfdf5);
+    border: 2px solid #99f6e4;
+    border-radius: 8px;
+    text-align: center;
+    page-break-inside: avoid;
+  }
+  .closer .line {
+    font-size: 17px;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .footer {
+    margin-top: 44px;
+    padding-top: 14px;
+    border-top: 1px solid #e2e8f0;
+    font-size: 11px;
+    color: #94a3b8;
+    text-align: center;
+  }
+  .footer strong { color: #0d9488; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>RarePath</h1>
+  <div class="subtitle">1-Minute Pitch &middot; HackHayward 2026</div>
+</div>
+
+<div class="beat">
+  <div class="label">The Problem</div>
+  <div class="line">
+    <span class="stat">300 million</span> people worldwide have a rare disease. The average patient waits <span class="stat">5 to 7 years</span> and sees <span class="stat">8 different doctors</span> before getting a correct diagnosis. And <span class="stat">95%</span> of these diseases have no approved treatment &mdash; so early diagnosis is everything.
+  </div>
+</div>
+
+<div class="beat">
+  <div class="label">The Solution</div>
+  <div class="line">
+    RarePath fixes this. A clinician enters symptoms &mdash; typed or spoken into an Omi wearable &mdash; and in under <span class="stat">15 seconds</span>, they get a ranked differential diagnosis across <span class="stat">4,335 rare diseases</span>, with confirmatory tests, cost estimates optimized for low-resource settings, live research citations pulled from current literature, and a voice briefing in any of <span class="stat">10 languages</span> for the patient's family.
+  </div>
+</div>
+
+<div class="beat">
+  <div class="label">Federated Learning</div>
+  <div class="line">
+    Under the hood, we built a real federated learning system &mdash; hospitals can train a shared diagnostic model together without ever sharing a single patient record. Only model weights cross the network. Zero data leaves the hospital.
+  </div>
+</div>
+
+<div class="beat">
+  <div class="label">Market &amp; Opportunity</div>
+  <div class="line">
+    This is a <span class="stat">$5.4 billion</span> market growing at <span class="stat">12% a year</span>, and no existing tool combines AI diagnosis, real-time research, voice output, and wearable integration in one pipeline. Our users are primary care doctors seeing unfamiliar symptom clusters, geneticists wanting a second opinion, and rural clinics with no specialist access.
+  </div>
+</div>
+
+<div class="beat">
+  <div class="label">The Team</div>
+  <div class="line">
+    We built RarePath in 24 hours.
+  </div>
+</div>
+
+<div class="closer">
+  <div class="line">Because no one should wait 7 years for a diagnosis.</div>
+</div>
+
+<div class="footer">
+  <strong>RarePath</strong> &middot; AI-Powered Rare Disease Diagnostic Assistant &middot; HackHayward 2026
+</div>
+
+</body>
+</html>

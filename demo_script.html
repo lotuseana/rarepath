@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RarePath Demo Script</title>
+<style>
+  @page { size: A4; margin: 20mm 18mm; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: #1e293b;
+    line-height: 1.7;
+    font-size: 14px;
+    background: #fff;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 32px;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 2.5px solid #0d9488;
+  }
+
+  .beat {
+    margin-bottom: 28px;
+    page-break-inside: avoid;
+  }
+
+  .stage {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 800;
+    color: #0d9488;
+    background: #f0fdfa;
+    border: 1px solid #ccfbf1;
+    border-radius: 4px;
+    padding: 2px 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  .action {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    font-style: italic;
+    margin-bottom: 6px;
+    padding-left: 12px;
+    border-left: 3px solid #0d9488;
+  }
+
+  .script {
+    font-size: 14px;
+    color: #1e293b;
+    line-height: 1.75;
+  }
+
+  .closer {
+    margin-top: 36px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #f0fdfa, #ecfdf5);
+    border: 2px solid #99f6e4;
+    border-radius: 8px;
+    text-align: center;
+    page-break-inside: avoid;
+  }
+  .closer .script {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .footer {
+    margin-top: 40px;
+    padding-top: 14px;
+    border-top: 1px solid #e2e8f0;
+    font-size: 11px;
+    color: #94a3b8;
+    text-align: center;
+  }
+  .footer strong { color: #0d9488; }
+</style>
+</head>
+<body>
+
+<h1>RarePath Demo Script</h1>
+<div class="subtitle">~90 seconds &middot; HackHayward 2026</div>
+
+<div class="beat">
+  <div class="stage">Opening</div>
+  <div class="action">App is open — Clinician tab showing</div>
+  <div class="script">
+    "This is RarePath &mdash; an AI-powered rare disease diagnostic assistant. 300 million people worldwide have a rare disease, and the average patient waits 5 to 7 years to get diagnosed. RarePath brings that down to seconds."
+  </div>
+</div>
+
+<div class="beat">
+  <div class="stage">Load Demo Case</div>
+  <div class="action">Click the "Duchenne Muscular Dystrophy" demo case button</div>
+  <div class="script">
+    "Let's walk through a case. A 4-year-old boy comes in with progressive muscle weakness, difficulty climbing stairs, and elevated creatine kinase. I'll load this demo case &mdash; you can see the symptoms, exam findings, and family history auto-populate."
+  </div>
+</div>
+
+<div class="beat">
+  <div class="stage">Run Diagnosis</div>
+  <div class="action">Click "Analyze Symptoms"</div>
+  <div class="script">
+    "When I hit analyze, a few things happen in sequence. First, the symptoms get mapped to standardized HPO codes &mdash; that's the Human Phenotype Ontology, a database of nearly 20,000 medical terms. Then those codes are cross-referenced against 4,335 rare diseases from Orphanet. Finally, an LLM generates a ranked differential diagnosis. The whole pipeline takes under 15 seconds."
+  </div>
+</div>
+
+<div class="beat">
+  <div class="stage">Results</div>
+  <div class="action">Results appear &mdash; scroll through them</div>
+  <div class="script">
+    "Here are the results. The top candidate is Duchenne Muscular Dystrophy at 42% probability, with a full explanation of why it matches. Each candidate comes with a recommended confirmatory test and a cost estimate &mdash; we prioritize low-cost tests for resource-limited settings. You'll also see red flags and an uncertainty note suggesting what additional information would increase confidence."
+  </div>
+</div>
+
+<div class="beat">
+  <div class="stage">Live Research</div>
+  <div class="action">Scroll down to Live Research section</div>
+  <div class="script">
+    "Below the diagnosis, we have live research pulled in real time from Perplexity Sonar &mdash; active clinical trials, recent publications, treatment advances, and specialist centers, all with cited sources. This isn't a static database &mdash; it's pulling the latest literature right now."
+  </div>
+</div>
+
+<div class="beat">
+  <div class="stage">Multilingual Voice</div>
+  <div class="action">Scroll to voice section, click the Spanish flag button</div>
+  <div class="script">
+    "For multilingual accessibility, we can generate an audio briefing on demand in 10 languages. If I click Spanish, it translates the clinical summary and synthesizes it through ElevenLabs. This is useful for explaining a diagnosis to a patient's family in their native language."
+  </div>
+</div>
+
+<div class="beat">
+  <div class="stage">PDF Export</div>
+  <div class="action">Click "Export PDF" button</div>
+  <div class="script">
+    "We can also export a full clinical report as a PDF &mdash; professional layout with the HPO mapping table, probability bars, confirmatory tests, research citations, and a clinical disclaimer."
+  </div>
+</div>
+
+<div class="beat">
+  <div class="stage">Federation Tab</div>
+  <div class="action">Click the "Federation" tab</div>
+  <div class="script">
+    "Now the Federation tab. This demonstrates how hospitals could collaborate on rare disease diagnosis without sharing any patient data. We implemented real Federated Averaging &mdash; FedAvg &mdash; across 7 simulated hospital nodes around the world."
+  </div>
+</div>
+
+<div class="beat">
+  <div class="stage">Federation Animation</div>
+  <div class="action">Click "Start" &mdash; point to convergence chart as it draws</div>
+  <div class="script">
+    "Each round has three phases. First, the global model weights are distributed to all hospitals. Then each hospital trains locally on its own private patient data. Finally, the updated weights are sent back and averaged. No patient records ever leave the hospital &mdash; only model gradients traverse the network. You can watch the model converge in real time &mdash; accuracy climbs from around 50% to nearly 79% over 20 rounds across 200 rare disease classes. The 'Data Shared' counter stays at zero the entire time."
+  </div>
+</div>
+
+<div class="closer">
+  <div class="stage">Closing</div>
+  <div class="script">
+    "RarePath &mdash; from symptoms to diagnosis in under 15 seconds.<br>Because no one should wait 7 years for a diagnosis."
+  </div>
+</div>
+
+<div class="footer">
+  <strong>RarePath</strong> &middot; Rare Disease Diagnostic Assistant &middot; HackHayward 2026
+</div>
+
+</body>
+</html>
